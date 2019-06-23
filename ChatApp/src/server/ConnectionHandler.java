@@ -17,38 +17,35 @@ public class ConnectionHandler extends Thread {
 	private Queue<String> messageQueue;
 
 	public ConnectionHandler(Socket socket, Queue<String> messageQueue) throws IOException {
+
 		super();
+
 		this.socket = socket;
 		this.messageQueue = messageQueue;
+
 		in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+
 		message = null;
 	}
 
 	@Override
 	public void run() {
-		while (!socket.isClosed()) {
-			try {
+		try {
+			while (!socket.isClosed()) {
 				message = in.readLine();
 				while (message != null && !message.equals("")) {
 					System.out.println(message);
 					messageQueue.add(message);
 					message = in.readLine();
 				}
-			} catch (IOException e) {
-				try {
-					disconnect();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public void disconnect() throws IOException {
-		socket.close();
-	}
-
+//
 	public void send(String messege) {
 		try {
 			out.write(messege);
