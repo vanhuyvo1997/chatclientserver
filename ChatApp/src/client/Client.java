@@ -12,8 +12,9 @@ import java.nio.charset.Charset;
 import java.util.Scanner;
 
 public class Client {
-
-	private static final int minPortNum = 1024, maxPortNum = 65535;
+	
+	public static final int MIN_PORT_NUMBER = 1024;
+	public static final int MAX_PORT_NUMBER = 65535;
 
 	private Socket socket;
 	private BufferedReader in;
@@ -70,7 +71,7 @@ public class Client {
 				strTemp = scanner.nextLine();
 				number = Integer.parseInt(strTemp);
 				
-				if (number < Client.minPortNum || number > Client.maxPortNum) {
+				if (number < Client.MIN_PORT_NUMBER || number > Client.MAX_PORT_NUMBER) {
 					err = true;
 				}
 					
@@ -79,8 +80,8 @@ public class Client {
 			}
 			
 			if (err) {
-				System.out.println("Port value must be greater or equal than " + Client.minPortNum
-						+ " and lower or equal " + Client.maxPortNum);
+				System.out.println("Port value must be greater or equal than " + Client.MIN_PORT_NUMBER
+						+ " and lower or equal " + Client.MAX_PORT_NUMBER);
 			}
 			
 		} while (err);
