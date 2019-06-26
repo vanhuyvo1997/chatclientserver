@@ -40,7 +40,7 @@ public class Client {
 
 		while (!err) {
 
-			System.out.println("input your Hostname:");
+			System.out.println("input your Host IP Address:");
 			sc = new Scanner(System.in);
 			hostName = sc.nextLine();
 

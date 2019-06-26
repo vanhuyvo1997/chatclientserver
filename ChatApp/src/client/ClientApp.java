@@ -9,8 +9,8 @@ public class ClientApp {
 			Client app = new Client();
 			app.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block 
-			e.printStackTrace();
+			
+			System.out.println("Can't send or recieve messgae!");
 		}
 	}
 	

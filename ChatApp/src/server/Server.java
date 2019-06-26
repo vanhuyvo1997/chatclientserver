@@ -13,19 +13,20 @@ import java.util.Scanner;
 
 public class Server {
 
-	private static final int minPortNum = 1024, maxPortNum = 65535;
+	public static final String SERVER_IP = "192.168.40.157";
+	public static final int MIN_PORT_NUMBER = 1024;
+	public static final int MAX_PORT_NUMBER = 65535;
 
 	private ServerSocket serverSocket;
 	private List<ConnectionHandler> listConnection;
 	private Queue<String> messageQueue;
-	private Thread sender;
 	private InetSocketAddress inetSocket;
-	private int port;
 	private boolean isExit;
 
 	public Server() throws IOException {
 		super();
 		init();
+		System.out.println("Server has started...");
 		showServerInfo();
 	}
 
@@ -33,12 +34,11 @@ public class Server {
 		listConnection = new LinkedList<>();
 		messageQueue = new PriorityQueue<>();
 		serverSocket = new ServerSocket();
-		typePortNumber();
-		inetSocket = new InetSocketAddress(InetAddress.getLocalHost(), port);
+		inetSocket = new InetSocketAddress(InetAddress.getByName(SERVER_IP), typePortNumber());
 		serverSocket.bind(inetSocket);
 	}
 
-	private void typePortNumber() {
+	private int typePortNumber() {
 
 		int number = 0;
 		boolean err = false;
@@ -54,18 +54,18 @@ public class Server {
 				strTemp = scanner.nextLine();
 				number = Integer.parseInt(strTemp);
 
-				if (number < Server.minPortNum || number > Server.maxPortNum)
+				if (number < Server.MIN_PORT_NUMBER || number > Server.MAX_PORT_NUMBER)
 					err = true;
 			} catch (Exception e) {
 				err = true;
 			}
 
 			if (err) {
-				System.out.println("Port value must be greater or equal than " + Server.minPortNum
-						+ " and lower or equal " + Server.maxPortNum);
+				System.out.println("Port value must be greater or equal than " + Server.MIN_PORT_NUMBER
+						+ " and lower or equal " + Server.MAX_PORT_NUMBER);
 			}
 		} while (err);
-		port = number;
+		return number;
 	}
 
 	private void listenConnections() throws IOException {
@@ -79,33 +79,39 @@ public class Server {
 		}
 
 	}
+	
+	
 
 	private void startSender() {
-		sender = new Thread(new Runnable() {
-			public void run() {
-				try {
-					while (!isExit) {
-						if (messageQueue.size() > 0) {
-							for (ConnectionHandler connection : listConnection) {
-								if (connection.isAlive()) {
-									connection.send(messageQueue.peek());
-								} else {
-									listConnection.remove(connection);
-								}
-							}
-							messageQueue.poll();
-						}
-						Thread.sleep(500);
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block 
-					e.printStackTrace();
-				} catch (Exception ex) {
-					ex.printStackTrace();
+		Thread sender;
+		sender = new Thread(() -> {
+
+			try {
+				while (!isExit) {
+					sendMessageToClients();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
+
 		}, "Sender");
 		sender.start();
+	}
+	
+	private void sendMessageToClients() throws InterruptedException{
+		if (!messageQueue.isEmpty()) {
+			for (ConnectionHandler connection : listConnection) {
+				if (connection.isAlive()) {
+					connection.send(messageQueue.peek());
+				} else {
+					listConnection.remove(connection);
+				}
+			}
+			messageQueue.poll();
+		}
+		Thread.sleep(100);
 	}
 
 	public void start() throws IOException {
@@ -115,8 +121,7 @@ public class Server {
 
 	private void showServerInfo() {
 		System.out.println(new StringBuilder("Server Address: ").append("\n\t Port: ").append(inetSocket.getPort())
-				.append("\n\t Host name: ").append(inetSocket.getHostName()).append("\n\t Address: ")
-				.append(inetSocket.getAddress()).append("\n\t Canonical Host Name: ")
-				.append(inetSocket.getAddress().getCanonicalHostName()));
+				.append("\n\t Address: ").append(inetSocket.getAddress()));
+
 	}
 }
