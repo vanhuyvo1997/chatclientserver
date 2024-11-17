@@ -3,6 +3,7 @@ THE CONSOLE CHAT USING JAVA SOCKET
 
 
 I. INTRODUCTION
+
  The application include two sperate parts:
  - The server takes responsibility to hear messages sent by clients.
  - The clients take responsibility to send messages to the server.
